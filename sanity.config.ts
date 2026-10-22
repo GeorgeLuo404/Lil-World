@@ -1,5 +1,7 @@
+"use client";
+
 import { defineConfig } from "sanity";
-import { deskTool } from "sanity/desk";
+import { structureTool } from "sanity/structure";
 import schemas from "./sanity/schemas"
 
 const config = defineConfig({
@@ -8,7 +10,7 @@ const config = defineConfig({
 	title: "My Personal Website",
 	apiVersion: "2023-04-27",
 	basePath: "/admin",
-	plugins: [deskTool()],
+	plugins: [structureTool()],
 	schema: { types: schemas }
 });
 
