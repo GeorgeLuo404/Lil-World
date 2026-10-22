@@ -2,7 +2,9 @@ import { getPages } from "@/sanity/sanity-utils";
 import "../globals.css";
 import Link from "next/link";
 
-export const revalidate = 0;
+// Serve cached pages and refresh Sanity content in the background at most once a minute,
+// so a slow Sanity response can't time out a visitor's request.
+export const revalidate = 60;
 
 export const metadata = {
   title: "George Lil World",

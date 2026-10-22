@@ -1,12 +1,18 @@
-import { getPage } from "@/sanity/sanity-utils";
-import { PortableText } from "@portabletext/react";
+import { getPage, getPages } from "@/sanity/sanity-utils";
+import { PortableText } from "next-sanity";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
+export async function generateStaticParams() {
+  const pages = await getPages();
+  return pages.map((page) => ({ slug: page.slug }));
+}
+
 export default async function Page({ params }: Props) {
-  const page = await getPage(params.slug);
+  const { slug } = await params;
+  const page = await getPage(slug);
 
   if (page == null) {
     return <></>;

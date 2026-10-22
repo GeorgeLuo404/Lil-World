@@ -1,31 +1,22 @@
-"use client";
+import { getProject, getProjects } from "@/sanity/sanity-utils";
+import { PortableText } from "next-sanity";
+import { notFound } from "next/navigation";
+import ImageSlider from "./image-slider";
 
-import { useState, useEffect } from "react";
-import { getProject } from "@/sanity/sanity-utils";
-import { PortableText } from "@portabletext/react";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+type Props = {
+  params: Promise<{ project: string }>;
+};
 
-export default function Project() {
-  const params = useParams();
-  const slug = params?.project as string;
-  const [project, setProject] = useState<any | null>(null);
+export async function generateStaticParams() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ project: project.slug }));
+}
 
-  useEffect(() => {
-    async function fetchProject() {
-      if (!slug) return;
-      const data = await getProject(slug);
-      setProject(data);
-    }
-    fetchProject();
-  }, [slug]);
+export default async function Project({ params }: Props) {
+  const { project: slug } = await params;
+  const project = await getProject(slug);
 
-  if (!project) return <div className="text-center py-10">Loading...</div>;
+  if (!project) notFound();
   if (!project.images || project.images.length === 0) return <div>No images available.</div>;
 
   const createdAt = project.createdAt
@@ -43,24 +34,7 @@ export default function Project() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Swiper Image Slider */}
-      <Swiper
-        modules={[Navigation, Pagination]}
-        navigation
-        pagination={{ clickable: true }}
-        className="rounded-lg overflow-hidden mb-6"
-      >
-        {project.images.map((image: string, index: number) => (
-          <SwiperSlide key={index}>
-            <Image
-              src={image}
-              alt={project.name}
-              width={1920}
-              height={1080}
-              className="w-full h-auto object-cover rounded-lg"
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <ImageSlider images={project.images} alt={project.name} />
 
       {/* Project Info */}
       <h1 className="text-xl md:text-2xl font-medium text-gray-900 mb-3">
